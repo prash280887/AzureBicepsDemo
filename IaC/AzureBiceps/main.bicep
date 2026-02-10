@@ -2,7 +2,7 @@
 param storageAccountName string
 
 @description('Location for resources')
-param location string = resourceGroup().location
+param location string = 'eastus'
 
 @description('Storage SKU')
 param storageSku string = 'Standard_LRS'
