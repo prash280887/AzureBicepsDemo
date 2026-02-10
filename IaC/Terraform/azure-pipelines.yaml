@@ -1,0 +1,99 @@
+trigger:
+  - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  terraformVersion: '1.5.0'
+  resourceGroupName: 'my-rg-tf-01'
+  location: 'eastus'
+# Azure Service Principal credentials (set in Azure Pipelines Variable Groups or Pipeline Settings)
+  azureSubscriptionId: '$(AZURE_SUBSCRIPTION_ID)'
+  azureClientId: '$(AZURE_CLIENT_ID)'
+  azureClientSecret: '$(AZURE_CLIENT_SECRET)'
+  azureTenantId: '$(AZURE_TENANT_ID)'
+
+stages:
+  - stage: Validate
+    jobs:
+      - job: TerraformValidate
+        steps:
+          - task: UsePythonVersion@0
+            inputs:
+              versionSpec: '3.x'
+
+          - task: TerraformInstaller@0
+            inputs:
+              terraformVersion: $(terraformVersion)
+
+          - task: AzureCLI@2
+            inputs:
+              azureSubscription: 'Azure Service Connection'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                az account set --subscription $(azureSubscriptionId)
+
+          - script: terraform fmt -check
+            displayName: 'Terraform Format Check'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/IaC/Terraform'
+
+          - script: terraform init
+            displayName: 'Terraform Init'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/IaC/Terraform'
+
+          - script: terraform validate
+            displayName: 'Terraform Validate'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/IaC/Terraform'
+
+  - stage: Plan
+    dependsOn: Validate
+    jobs:
+      - job: TerraformPlan
+        steps:
+          - task: TerraformInstaller@0
+            inputs:
+              terraformVersion: $(terraformVersion)
+
+          - script: terraform init
+            displayName: 'Terraform Init'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/IaC/Terraform'
+
+          - script: terraform plan -out=tfplan \
+              -var="resource_group_name=$(resourceGroupName)" \
+              -var="location=$(location)" \
+              -var="azure_client_id=$(azureClientId)" \
+              -var="azure_client_secret=$(azureClientSecret)" \
+              -var="azure_tenant_id=$(azureTenantId)" \
+              -var="subscription_id=$(azureSubscriptionId)"
+            displayName: 'Terraform Plan'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/IaC/Terraform'
+
+          - task: PublishBuildArtifacts@1
+            inputs:
+              pathToPublish: '$(System.DefaultWorkingDirectory)/IaC/Terraform/tfplan'
+              artifactName: 'tfplan'
+
+  - stage: Apply
+    dependsOn: Plan
+    condition: succeeded()
+    jobs:
+      - job: TerraformApply
+        steps:
+          - task: TerraformInstaller@0
+            inputs:
+              terraformVersion: $(terraformVersion)
+
+          - task: DownloadBuildArtifacts@0
+            inputs:
+              artifactName: 'tfplan'
+              downloadPath: '$(System.DefaultWorkingDirectory)/IaC/Terraform'
+
+          - script: terraform init
+            displayName: 'Terraform Init'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/IaC/Terraform'
+
+          - script: terraform apply -auto-approve tfplan
+            displayName: 'Terraform Apply'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/IaC/Terraform'
