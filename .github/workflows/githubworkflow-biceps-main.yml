@@ -39,8 +39,8 @@ jobs:
           scope: resourcegroup
           subscriptionId: ${{ fromJSON(secrets.AZURE_CREDENTIALS).subscriptionId }}
           resourceGroupName: ${{ env.RESOURCE_GROUP }}
-          template: ./main.bicep
-          parameters: ./${{ env.PARAMS_FILE }}
+          template: ./IaC/AzureBiceps/main.bicep
+          parameters: ./IaC/AzureBiceps/${{ env.PARAMS_FILE }}
 
       # - name: Setup Node.js
       #   uses: actions/setup-node@v3
