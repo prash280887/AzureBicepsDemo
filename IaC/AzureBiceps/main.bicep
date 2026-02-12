@@ -41,7 +41,7 @@ module appserviceModule 'modules/appservices.bicep' = {
   params: {
     appServiceName: 'myappdev${uniqueString(resourceGroup().name)}'
     appServicePlanName: 'planmyappdev${uniqueString(resourceGroup().name)}'
-    appServicePlanSku: 'P1v2'
+    appServicePlanSku: 'S1'
     location: location
   }
 
