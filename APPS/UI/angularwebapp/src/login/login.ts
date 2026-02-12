@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-login',
-  imports: [],
+  imports: [FormsModule],
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })
@@ -17,7 +17,7 @@ export class Login {
   router = inject(Router);
 
   login() {
-    if (this.username === 'admin' && this.password === 'admin') {
+    if (this.username === 'admin' && this.password === 'password') {
       
       let isloggedIn: boolean = true;
       localStorage.setItem('isLoggedIn', 'true');

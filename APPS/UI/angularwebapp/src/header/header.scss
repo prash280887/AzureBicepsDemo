@@ -1,0 +1,14 @@
+.nav
+{
+    display: flex;
+    justify-content: space-between;
+    background-color:lightblue;
+    padding: 10px;  
+}
+
+.nav  a
+{
+    color: maroon;
+    text-decoration: none;
+    margin: 0 10px;
+}

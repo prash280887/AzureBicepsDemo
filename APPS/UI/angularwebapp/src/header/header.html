@@ -1,1 +1,5 @@
-<p>header works!</p>
+<nav class="nav">
+    <span>Welcome {{username()}}</span>
+   <a routerLink="/home" routerLinkActive="active">Home</a>
+    <a (click)="signout()" routerLinkActive="active">Signout</a>
+</nav>
