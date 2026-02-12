@@ -13,6 +13,7 @@ param tags object = {
   Project: 'AzureBicepsDemo'
 }
 
+
 // Storage Account Module
 module storageModule 'modules/storage.bicep' = {
   name: 'stg-${uniqueString(resourceGroup().id)}'
