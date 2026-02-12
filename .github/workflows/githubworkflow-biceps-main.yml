@@ -1,3 +1,12 @@
+# Add in Github -settings - secrets and variable -- new secret AZURE_CREDENTIALS as json  appreg props and value:
+#Eg. {
+#   "clientId": "",
+#   "clientSecret": "",
+#   "subscriptionId": "",
+#   "tenantId": ""
+# }
+
+
 name: Deploy Azure Bicep
 on:
   push:
@@ -21,11 +30,10 @@ jobs:
       - name: Azure Login
       - uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
-          
+          client-id: ${{ fromJSON(secrets.AZURE_CREDENTIALS).clientId }}
+          tenant-id: ${{ fromJSON(secrets.AZURE_CREDENTIALS).tenantId }}
+          subscription-id: ${{ fromJSON(secrets.AZURE_CREDENTIALS).subscriptionId }}
+          client-secret: ${{ fromJSON(secrets.AZURE_CREDENTIALS).clientSecret }}
 
       # Determine which parameter file to use
       - name: Set environment variables
@@ -43,7 +51,7 @@ jobs:
         uses: azure/arm-deploy@v2
         with:
           scope: resourcegroup
-          subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          subscriptionId: ${{ fromJSON(secrets.AZURE_CREDENTIALS).subscriptionId }}
           resourceGroupName: ${{ env.RESOURCE_GROUP }}
           template: ./main.bicep
           parameters: ./${{ env.PARAMS_FILE }}
