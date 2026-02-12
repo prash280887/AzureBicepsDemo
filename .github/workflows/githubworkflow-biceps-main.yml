@@ -19,10 +19,7 @@ jobs:
 
       - uses: azure/login@v2
         with:
-          client-id: ${{ fromJSON(secrets.AZURE_CREDENTIALS).clientId }}
-          tenant-id: ${{ fromJSON(secrets.AZURE_CREDENTIALS).tenantId }}
-          subscription-id: ${{ fromJSON(secrets.AZURE_CREDENTIALS).subscriptionId }}
-          client-secret: ${{ fromJSON(secrets.AZURE_CREDENTIALS).clientSecret }}
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       # Determine which parameter file to use
       - name: Set environment variables
