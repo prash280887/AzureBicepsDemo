@@ -15,10 +15,8 @@ jobs:
     environment: ${{ github.ref == 'refs/heads/main' && 'production' || 'development' }}
     
     steps:
-      - name: Checkout Repository
       - uses: actions/checkout@v4
 
-      - name: Azure Login
       - uses: azure/login@v2
         with:
           client-id: ${{ fromJSON(secrets.AZURE_CREDENTIALS).clientId }}
